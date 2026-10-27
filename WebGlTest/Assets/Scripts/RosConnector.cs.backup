@@ -1,0 +1,348 @@
+using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.IO;
+
+public class RosConnector : MonoBehaviour
+{
+    public static RosConnector Instance { get; private set; }
+
+    [Header("ROS Connection Settings")]
+    public string rosIP = "192.168.100.161";
+    public string rosPort = "9090";
+
+    [Header("Debug")]
+    [Tooltip("Max number of raw messages to log at startup, then logging stops. Prevents Debug.Log from bottlenecking high-frequency topics.")]
+    public int maxRawLogs = 5;
+
+    [Header("High-Frequency Topics")]
+    [Tooltip("Topics listed here only keep the LATEST message per frame instead of queueing every one. Prevents backlog on fast topics like /joint_states.")]
+    public string[] latestOnlyTopics = new string[] { "/joint_states" };
+
+    private ClientWebSocket _socket = new ClientWebSocket();
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+
+    private Dictionary<string, Action<string>> _subscribers = new Dictionary<string, Action<string>>();
+    private HashSet<string> _advertisedTopics = new HashSet<string>();
+    private List<string> _pendingMessages = new List<string>();
+    private ConcurrentQueue<Action> _mainThreadQueue = new ConcurrentQueue<Action>();
+
+    // Latest-only fast path: topic -> most recent raw json. Overwritten, never queued.
+    private ConcurrentDictionary<string, string> _latestPerTopic = new ConcurrentDictionary<string, string>();
+    private HashSet<string> _latestOnlySet;
+
+    // Subscriber-Info für Re-Subscribe nach Reconnect
+    private Dictionary<string, string> _subscriberTypes = new Dictionary<string, string>();
+
+    [Header("Reconnect")]
+    public float reconnectInterval = 5f;
+    private bool _reconnecting = false;
+
+    private int _rawLogCount = 0;
+
+    public bool IsConnected => _socket != null && _socket.State == WebSocketState.Open;
+
+    void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+        DontDestroyOnLoad(gameObject);
+
+        _latestOnlySet = new HashSet<string>(latestOnlyTopics);
+    }
+
+    async void Start()
+    {
+        float timeout = 3f;
+        float waited = 0f;
+        while (!AppConfig.IsLoaded && waited < timeout)
+        {
+            await Task.Delay(100);
+            waited += 0.1f;
+        }
+
+        if (AppConfig.IsLoaded)
+        {
+            rosIP = AppConfig.RosIp;
+            rosPort = AppConfig.RosPort;
+            Debug.Log($"[RosConnector] Config geladen: {rosIP}:{rosPort}");
+        }
+        else
+        {
+            Debug.LogWarning($"[RosConnector] AppConfig nicht geladen, verwende Inspector-Werte: {rosIP}:{rosPort}");
+        }
+
+        await ConnectToRos();
+
+        StartCoroutine(ReconnectLoop());
+    }
+
+    void Update()
+    {
+        // Drain queued (non-latest-only) messages fully every frame.
+        while (!_mainThreadQueue.IsEmpty)
+        {
+            if (_mainThreadQueue.TryDequeue(out var action)) action?.Invoke();
+        }
+
+        // Process latest-only topics: exactly one message per topic per frame,
+        // always the freshest — old ones are simply overwritten and discarded.
+        if (_latestPerTopic.Count > 0)
+        {
+            foreach (var topic in _latestOnlySet)
+            {
+                if (_latestPerTopic.TryRemove(topic, out string json))
+                {
+                    ProcessIncomingMessage(json);
+                }
+            }
+        }
+    }
+
+    public async Task ConnectToRos()
+    {
+        if (_socket.State == WebSocketState.Aborted || _socket.State == WebSocketState.Closed)
+        {
+            _socket.Dispose();
+            _socket = new ClientWebSocket();
+            _cts = new CancellationTokenSource();
+        }
+
+        string url = $"ws://{rosIP}:{rosPort}";
+        Debug.Log($"[RosConnector] Versuche Verbindung zu {url} ...");
+
+        try
+        {
+            await _socket.ConnectAsync(new Uri(url), _cts.Token);
+            Debug.Log("<color=green>[RosConnector] Verbunden mit ROS!</color>");
+
+            _ = ReceiveLoop();
+
+            foreach (var msg in _pendingMessages)
+            {
+                await SendWebSocketMessageRaw(msg);
+            }
+            _pendingMessages.Clear();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[RosConnector] Verbindungsfehler: {e.Message}");
+        }
+    }
+
+    // --- ADVERTISE ---
+    public async void Advertise(string topic, string type)
+    {
+        if (_advertisedTopics.Contains(topic)) return;
+
+        string advMsg = "{\"op\":\"advertise\",\"topic\":\"" + topic + "\", \"type\":\"" + type + "\"}";
+        await SendWebSocketMessage(advMsg);
+        _advertisedTopics.Add(topic);
+        Debug.Log($"[RosConnector] Advertised: {topic} ({type})");
+    }
+
+    // --- SENDEN ---
+    public async void Publish(string topic, string type, string jsonMessage)
+    {
+        string rosPacket = "{\"op\":\"publish\",\"topic\":\"" + topic + "\", \"type\":\"" + type + "\",\"msg\":" + jsonMessage + "}";
+        await SendWebSocketMessage(rosPacket);
+    }
+
+    public void PublishRaw(string topic, string type, string jsonMessage)
+    {
+        Publish(topic, type, jsonMessage);
+    }
+
+    // --- EMPFANGEN ---
+    public async void Subscribe(string topic, string type, Action<string> callback)
+    {
+        Debug.Log($"[RosConnector] Registriere Subscriber für: {topic} ({type})");
+
+        if (!_subscribers.ContainsKey(topic))
+            _subscribers.Add(topic, callback);
+        else
+            _subscribers[topic] += callback;
+
+        _subscriberTypes[topic] = type;
+
+        string subMsg = "{\"op\":\"subscribe\",\"topic\":\"" + topic + "\", \"type\": \"" + type + "\"}";
+
+        await SendWebSocketMessage(subMsg);
+    }
+
+    private async Task ReceiveLoop()
+    {
+        var buffer = new byte[81920];
+        while (IsConnected && !_cts.IsCancellationRequested)
+        {
+            try
+            {
+                WebSocketReceiveResult result;
+                using (var ms = new MemoryStream())
+                {
+                    do
+                    {
+                        result = await _socket.ReceiveAsync(new ArraySegment<byte>(buffer), _cts.Token);
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                            return;
+                        }
+                        ms.Write(buffer, 0, result.Count);
+                    }
+                    while (!result.EndOfMessage);
+
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        string json = Encoding.UTF8.GetString(ms.ToArray());
+
+                        // Gated raw logging — only logs the first few messages, then stops.
+                        // Unconditional Debug.Log here was the main cause of growing delay:
+                        // it runs on every single message and gets progressively expensive
+                        // as high-frequency topics (e.g. /joint_states) pile up per frame.
+                        if (_rawLogCount < maxRawLogs)
+                        {
+                            _rawLogCount++;
+                            string debugJson = json.Length > 300 ? json.Substring(0, 300) + "..." : json;
+                            Debug.Log($"[RosConnector RAW] Laenge: {json.Length} | Inhalt: {debugJson}");
+                        }
+
+                        string topic = ExtractTopicFromJson(json);
+
+                        if (topic != null && _latestOnlySet.Contains(topic))
+                        {
+                            // Fast path: just overwrite. Guarantees we only ever act on
+                            // the freshest message for this topic, no matter how fast
+                            // it's published — no backlog possible.
+                            _latestPerTopic[topic] = json;
+                        }
+                        else
+                        {
+                            _mainThreadQueue.Enqueue(() => ProcessIncomingMessage(json));
+                        }
+                    }
+                }
+            }
+            catch (Exception) { break; }
+        }
+    }
+
+    private void ProcessIncomingMessage(string json)
+    {
+        string parsedTopic = ExtractTopicFromJson(json);
+
+        foreach (var kvp in _subscribers)
+        {
+            bool match = false;
+            if (parsedTopic != null)
+                match = (parsedTopic == kvp.Key);
+            else
+                match = json.Contains(kvp.Key);
+
+            if (match)
+            {
+                try
+                {
+                    kvp.Value?.Invoke(json);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[RosConnector] Callback Error for {kvp.Key}: {e.Message}");
+                }
+            }
+        }
+    }
+
+    private string ExtractTopicFromJson(string json)
+    {
+        int idx = json.IndexOf("\"topic\"");
+        if (idx < 0) return null;
+
+        int colonIdx = json.IndexOf(':', idx + 7);
+        if (colonIdx < 0) return null;
+
+        int quoteStart = json.IndexOf('"', colonIdx + 1);
+        if (quoteStart < 0) return null;
+
+        int quoteEnd = json.IndexOf('"', quoteStart + 1);
+        if (quoteEnd < 0) return null;
+
+        string topic = json.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+        return topic.Replace("\\/", "/");
+    }
+
+    // --- RECONNECT ---
+    private IEnumerator ReconnectLoop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(reconnectInterval);
+
+            if (!IsConnected && !_reconnecting)
+            {
+                _reconnecting = true;
+                Debug.Log("[RosConnector] Verbindung verloren. Versuche Reconnect...");
+
+                var task = ConnectToRos();
+                while (!task.IsCompleted)
+                    yield return null;
+
+                if (IsConnected)
+                {
+                    Debug.Log("<color=green>[RosConnector] Reconnect erfolgreich!</color>");
+                    foreach (var kvp in _subscriberTypes)
+                    {
+                        string subMsg = "{\"op\":\"subscribe\",\"topic\":\"" + kvp.Key + "\", \"type\": \"" + kvp.Value + "\"}";
+                        var sendTask = SendWebSocketMessageRaw(subMsg);
+                        while (!sendTask.IsCompleted)
+                            yield return null;
+                    }
+
+                    var topicsCopy = new List<string>(_advertisedTopics);
+                    _advertisedTopics.Clear();
+                    foreach (var topic in topicsCopy)
+                    {
+                        // Type wird beim nächsten Publish erneut getriggert.
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[RosConnector] Reconnect fehlgeschlagen. Nächster Versuch in " + reconnectInterval + "s");
+                }
+
+                _reconnecting = false;
+            }
+        }
+    }
+
+    private async Task SendWebSocketMessage(string message)
+    {
+        if (IsConnected)
+        {
+            await SendWebSocketMessageRaw(message);
+        }
+        else
+        {
+            Debug.Log($"[RosConnector] Noch nicht verbunden. Nachricht gepuffert.");
+            _pendingMessages.Add(message);
+        }
+    }
+
+    private async Task SendWebSocketMessageRaw(string message)
+    {
+        var bytes = Encoding.UTF8.GetBytes(message);
+        await _socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, _cts.Token);
+    }
+
+    private void OnDestroy()
+    {
+        _cts.Cancel();
+        _socket?.Dispose();
+    }
+}

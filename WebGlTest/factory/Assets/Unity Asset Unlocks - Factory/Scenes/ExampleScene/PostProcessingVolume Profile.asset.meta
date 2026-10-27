@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0ba91edcf4f1e5d408fb31fe38bb6391
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183073
+  packageName: 'Asset Unlock: Factory'
+  packageVersion: 1.01
+  assetPath: Assets/Unity Asset Unlocks - Factory/Scenes/ExampleScene/PostProcessingVolume
+    Profile.asset
+  uploadId: 520001

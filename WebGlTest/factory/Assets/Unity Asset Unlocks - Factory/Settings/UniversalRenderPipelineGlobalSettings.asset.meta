@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4bfc9f2d7f1ceff47bb349086bf32945
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 183073
+  packageName: 'Asset Unlock: Factory'
+  packageVersion: 1.01
+  assetPath: Assets/Unity Asset Unlocks - Factory/Settings/UniversalRenderPipelineGlobalSettings.asset
+  uploadId: 520001

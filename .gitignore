@@ -25,3 +25,22 @@ Thumbs.db
 agdd-frontend-angular-updated-2/agdd/frontend/ANGULAR_AUTH_SETTINGS.txt
 agdd-frontend-angular-updated-2/agdd/frontend/ANGULAR_HEADER.txt
 agdd-frontend-angular-updated-2/agdd/frontend/src/assets/unity/StreamingAssets/config.json
+
+# Unity generated files
+**/[Ll]ibrary/
+**/[Tt]emp/
+**/[Ll]ogs/
+**/[Oo]bj/
+**/[Uu]serSettings/
+**/[Mm]emoryCaptures/
+**/[Rr]ecordings/
+**/.vs/
+**/*.csproj
+**/*.sln
+**/*.slnx
+**/*.user
+**/*.suo
+
+# WebGlTest configuration files: review before publishing
+WebGlTest/WebGLBuild/StreamingAssets/config.json
+WebGlTest/WebGLBuild_Clean/StreamingAssets/config.json
