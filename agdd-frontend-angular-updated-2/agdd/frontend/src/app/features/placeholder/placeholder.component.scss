@@ -1,0 +1,39 @@
+.placeholder-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 60vh;
+}
+
+.placeholder-box {
+  text-align: center;
+  padding: 56px 60px;
+  max-width: 460px;
+
+  .icon-wrapper {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--agdd-primary) 0%, var(--agdd-accent) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+
+    mat-icon { font-size: 40px; width: 40px; height: 40px; color: #fff; }
+  }
+
+  h2 { margin: 0 0 10px 0; font-size: 21px; }
+  p { color: var(--agdd-text-muted); font-size: 14px; line-height: 1.6; margin: 0 0 18px 0; }
+
+  .badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: var(--agdd-primary);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+}

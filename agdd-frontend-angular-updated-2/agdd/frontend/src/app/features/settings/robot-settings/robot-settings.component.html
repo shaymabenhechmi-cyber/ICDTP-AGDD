@@ -1,0 +1,179 @@
+﻿<div class="settings-detail-page agdd-fade-in">
+  <div class="detail-header">
+    <a mat-icon-button routerLink="/settings"
+       class="back-btn" aria-label="Back to settings">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+
+    <div>
+      <h1>Robot Settings</h1>
+      <p>Configure the robot and treatment server connections.</p>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-banner">
+      <mat-icon>warning</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <mat-icon class="spin">sync</mat-icon>
+      <span>Loading robot settings...</span>
+    </div>
+  } @else {
+    <div class="settings-form">
+
+      <!-- Operating Mode -->
+      <section class="agdd-card form-section">
+        <h3>
+          <mat-icon>tune</mat-icon>
+          Operating Mode
+        </h3>
+
+        <div class="field-row">
+          <div class="field-label">
+            <span>Active Robot Mode</span>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Select mode</mat-label>
+            <mat-select
+              [ngModel]="settings().mode"
+              (ngModelChange)="update('mode', $event)">
+              <mat-option value="simulation">
+                Unity Simulation
+              </mat-option>
+              <mat-option value="real">
+                Real Robot
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <p class="mode-note">
+          Choose which robot configuration will be active.
+          Save your changes after selecting a mode.
+        </p>
+      </section>
+
+      <!-- Simulation Robot -->
+      @if (settings().mode === 'simulation') {
+        <section class="agdd-card form-section">
+          <h3>
+            <mat-icon>desktop_windows</mat-icon>
+            Simulation Robot
+          </h3>
+
+          <div class="field-row">
+            <div class="field-label"><span>IP Address</span></div>
+            <mat-form-field appearance="outline">
+              <mat-label>Windows / Unity IP</mat-label>
+              <input matInput
+                [ngModel]="settings().simulationUnityHost"
+                (ngModelChange)="update('simulationUnityHost', $event)"
+                placeholder="192.168.100.243"
+                autocomplete="off">
+            </mat-form-field>
+          </div>
+
+          <div class="field-row">
+            <div class="field-label"><span>Port</span></div>
+            <mat-form-field appearance="outline">
+              <mat-label>Port</mat-label>
+              <input matInput type="number" min="1" max="65535"
+                [ngModel]="settings().simulationUnityPort"
+                (ngModelChange)="update('simulationUnityPort', $event)">
+            </mat-form-field>
+          </div>
+        </section>
+      }
+
+      <!-- Real Robot -->
+      @if (settings().mode === 'real') {
+        <section class="agdd-card form-section">
+          <h3>
+            <mat-icon>precision_manufacturing</mat-icon>
+            Real Robot
+          </h3>
+
+          <div class="field-row">
+            <div class="field-label"><span>IP Address</span></div>
+            <mat-form-field appearance="outline">
+              <mat-label>Robot controller IP</mat-label>
+              <input matInput
+                [ngModel]="settings().realRobotHost"
+                (ngModelChange)="update('realRobotHost', $event)"
+                placeholder="Enter real robot IP"
+                autocomplete="off">
+            </mat-form-field>
+          </div>
+
+          <div class="field-row">
+            <div class="field-label"><span>Port</span></div>
+            <mat-form-field appearance="outline">
+              <mat-label>Port</mat-label>
+              <input matInput type="number" min="1" max="65535"
+                [ngModel]="settings().realRobotPort"
+                (ngModelChange)="update('realRobotPort', $event)">
+            </mat-form-field>
+          </div>
+        </section>
+      }
+
+      <!-- Treatment Server (always visible) -->
+      <section class="agdd-card form-section">
+        <h3>
+          <mat-icon>dns</mat-icon>
+          Treatment Server
+        </h3>
+
+        <div class="field-row">
+          <div class="field-label"><span>IP Address</span></div>
+          <mat-form-field appearance="outline">
+            <mat-label>Ubuntu IP</mat-label>
+            <input matInput
+              [ngModel]="settings().treatmentHost"
+              (ngModelChange)="update('treatmentHost', $event)"
+              placeholder="192.168.100.161"
+              autocomplete="off">
+          </mat-form-field>
+        </div>
+
+        <div class="field-row">
+          <div class="field-label"><span>Port</span></div>
+          <mat-form-field appearance="outline">
+            <mat-label>Port</mat-label>
+            <input matInput type="number" min="1" max="65535"
+              [ngModel]="settings().treatmentPort"
+              (ngModelChange)="update('treatmentPort', $event)">
+          </mat-form-field>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <div class="actions-bar">
+        <button mat-stroked-button type="button"
+          (click)="resetToDefaults()" [disabled]="saving()">
+          <mat-icon>restart_alt</mat-icon>
+          Reset
+        </button>
+
+        <button mat-flat-button color="primary" type="button"
+          (click)="save()" [disabled]="saving()">
+          <mat-icon>{{ saving() ? 'sync' : 'save' }}</mat-icon>
+          {{ saving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+
+      @if (saved()) {
+        <div class="save-success">
+          <mat-icon>check_circle</mat-icon>
+          <span>Robot settings saved successfully.</span>
+        </div>
+      }
+    </div>
+  }
+</div>

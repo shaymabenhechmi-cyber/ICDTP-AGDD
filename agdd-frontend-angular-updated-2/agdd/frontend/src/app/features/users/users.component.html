@@ -1,0 +1,142 @@
+<div class="users-page agdd-fade-in">
+  <div class="page-header">
+    <div>
+      <h1>User Management</h1>
+      <p>Manage accounts and access roles for the AGDD platform.</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="openCreateForm()">
+      <mat-icon>add</mat-icon>
+      New User
+    </button>
+  </div>
+
+  <div class="agdd-card table-card">
+    <div class="table-toolbar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search</mat-label>
+        <input matInput placeholder="Name, email, username..."
+               (input)="onSearchChange($any($event.target).value)">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="pagedUsers()" class="users-table">
+
+      <ng-container matColumnDef="firstName">
+        <th mat-header-cell *matHeaderCellDef>First Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.firstName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastName">
+        <th mat-header-cell *matHeaderCellDef>Last Name</th>
+        <td mat-cell *matCellDef="let user">{{ user.lastName }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef>Username</th>
+        <td mat-cell *matCellDef="let user">{{ user.username }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="role">
+        <th mat-header-cell *matHeaderCellDef>Role</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="role-chip" [class]="'role-' + user.role.toLowerCase()">{{ user.role }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let user">
+          <span class="status-dot" [class.active]="user.enabled"></span>
+          {{ user.enabled ? 'Active' : 'Inactive' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+        <td mat-cell *matCellDef="let user" class="actions-cell">
+          <button mat-icon-button (click)="openEditForm(user)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteUser(user)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    @if (filteredUsers().length === 0) {
+      <div class="empty-state">
+        <mat-icon>group_off</mat-icon>
+        <p>No users found.</p>
+      </div>
+    }
+
+    <mat-paginator
+      [length]="filteredUsers().length"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25]"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+</div>
+
+@if (showForm()) {
+  <div class="modal-backdrop" (click)="closeForm()">
+    <div class="modal-panel agdd-card" (click)="$event.stopPropagation()">
+      <h2>{{ editingUser() ? 'Edit User' : 'New User' }}</h2>
+
+      <form [formGroup]="form" (ngSubmit)="saveUser()">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ editingUser() ? 'New password (optional)' : 'Password' }}</mat-label>
+          <input matInput type="password" formControlName="password">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role">
+            @for (role of roles(); track role.id) {
+              <mat-option [value]="role.name">{{ role.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="enabled" class="enabled-toggle">Account active</mat-slide-toggle>
+
+        <div class="modal-actions">
+          <button mat-button type="button" (click)="closeForm()">Cancel</button>
+          <button mat-flat-button color="primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,253 @@
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 250px;
+
+  /* =========================
+     LIGHT MODE
+     ========================= */
+
+  background: #245b7a;
+  color: #ffffff;
+
+  transition: background-color 0.25s ease;
+}
+
+
+/* =========================
+   LOGO
+   ========================= */
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 22px 20px;
+
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+
+  color: #ffffff;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+  mat-icon {
+    color: var(--agdd-accent);
+  }
+
+  span {
+    color: #ffffff;
+  }
+}
+
+
+/* =========================
+   NAVIGATION
+   ========================= */
+
+.sidebar-nav {
+  flex: 1;
+  padding-top: 8px;
+
+  background: transparent !important;
+
+  a {
+    color: #ffffff !important;
+
+    border-radius: 8px;
+    margin: 3px 10px;
+
+    transition: background-color 0.2s ease;
+
+    mat-icon {
+      color: #c7ddea;
+      transition: color 0.2s ease;
+    }
+
+    span {
+      color: #ffffff !important;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* HOVER */
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.10);
+
+      mat-icon {
+        color: #ffffff;
+      }
+    }
+  }
+
+  /* =========================
+     ACTIVE PAGE - LIGHT
+     ========================= */
+
+  .active-link {
+    background: #17435d !important;
+
+    color: #ffffff !important;
+
+    mat-icon {
+      color: #ffffff !important;
+    }
+
+    span {
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+  }
+}
+
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+  padding: 6px 0;
+
+  .logout-link {
+    color: #ffffff !important;
+
+    cursor: pointer;
+
+    margin: 3px 10px;
+
+    border-radius: 8px;
+
+    transition: background-color 0.2s ease;
+
+    mat-icon {
+      color: #ffb4b4;
+    }
+
+    span {
+      color: #ffffff !important;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+}
+
+
+/* =====================================================
+   DARK MODE
+   ===================================================== */
+
+/*
+  IMPORTANT:
+  ThemeService ajoute:
+
+  <html data-theme="dark">
+
+  donc on utilise :host-context()
+  dans le SCSS du component.
+*/
+
+:host-context(html[data-theme='dark']) .sidebar {
+  background: #102f45;
+}
+
+
+/* =========================
+   DARK - LOGO
+   ========================= */
+
+:host-context(html[data-theme='dark']) .sidebar-logo {
+
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+
+  mat-icon {
+    color: var(--agdd-accent);
+  }
+
+  span {
+    color: #ffffff;
+  }
+}
+
+
+/* =========================
+   DARK - NAVIGATION
+   ========================= */
+
+:host-context(html[data-theme='dark']) .sidebar-nav {
+
+  a {
+
+    mat-icon {
+      color: #9db8c9;
+    }
+
+    span {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.07);
+
+      mat-icon {
+        color: #ffffff;
+      }
+    }
+  }
+
+
+  /* =========================
+     DARK - ACTIVE PAGE
+     ========================= */
+
+  .active-link {
+
+    background: #081d2b !important;
+
+    color: #ffffff !important;
+
+    mat-icon {
+      color: #ffffff !important;
+    }
+
+    span {
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+  }
+}
+
+
+/* =========================
+   DARK - FOOTER
+   ========================= */
+
+:host-context(html[data-theme='dark']) .sidebar-footer {
+
+  border-top-color: rgba(255, 255, 255, 0.08);
+
+  .logout-link {
+
+    mat-icon {
+      color: #ff9b9b;
+    }
+
+    span {
+      color: #ffffff !important;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+}

@@ -1,0 +1,393 @@
+﻿<mat-toolbar class="navbar">
+
+  <!-- ============================================================
+       BRAND
+       ============================================================ -->
+
+  <div class="navbar-title">
+
+    <mat-icon class="title-icon">
+      precision_manufacturing
+    </mat-icon>
+
+    <div class="brand-text">
+
+      <div class="main-title">
+        Automated Gear Defect Detection
+      </div>
+
+      <div class="sub-title">
+        AGDD Industry 4.0 Platform
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <span class="spacer"></span>
+
+
+  <!-- ============================================================
+       THEME TOGGLE
+       ============================================================ -->
+
+  <button
+    mat-icon-button
+    type="button"
+    class="navbar-icon-btn"
+    (click)="toggleTheme()"
+    [matTooltip]="
+      themeService.isDark()
+        ? 'Switch to light mode'
+        : 'Switch to dark mode'
+    "
+    aria-label="Toggle theme"
+  >
+
+    <mat-icon>
+      {{
+        themeService.isDark()
+          ? 'light_mode'
+          : 'dark_mode'
+      }}
+    </mat-icon>
+
+  </button>
+
+
+  <!-- ============================================================
+       NOTIFICATIONS
+       ============================================================ -->
+
+  <button
+    mat-icon-button
+    type="button"
+    class="navbar-icon-btn notification-btn"
+    [matMenuTriggerFor]="notificationsMenu"
+    (menuOpened)="refreshNotifications()"
+    [matBadge]="unreadCount() || null"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+    matTooltip="Notifications"
+    aria-label="Open notifications"
+  >
+
+    <mat-icon>
+      notifications_none
+    </mat-icon>
+
+  </button>
+
+
+  <!-- ============================================================
+       NOTIFICATIONS MENU
+       ============================================================ -->
+
+  <mat-menu #notificationsMenu="matMenu" panelClass="alerts-menu">
+
+    <div
+      class="alerts-menu-header"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="alerts-menu-title">
+        Notifications
+      </div>
+
+      @if (unreadCount() > 0) {
+
+        <button
+          type="button"
+          class="mark-all-btn"
+          (click)="markAllAsRead()"
+        >
+          Mark all as read
+        </button>
+
+      }
+
+    </div>
+
+
+    @if (notifications().length === 0) {
+
+      <div class="alert-empty">
+
+        <mat-icon>
+          notifications_off
+        </mat-icon>
+
+        <div>
+
+          <div class="empty-title">
+            No notifications
+          </div>
+
+          <div class="empty-subtitle">
+            You're all caught up
+          </div>
+
+        </div>
+
+      </div>
+
+    } @else {
+
+      <div class="notification-list">
+
+        @for (
+          notification of notifications();
+          track notification.id
+        ) {
+
+          <button
+            type="button"
+            class="notification-row"
+            [class.notification-unread]="!notification.read"
+            [class.notification-info]="
+              notification.type === 'INFO'
+            "
+            [class.notification-warning]="
+              notification.type === 'WARNING'
+            "
+            [class.notification-critical]="
+              notification.type === 'CRITICAL'
+            "
+            (click)="markAsRead(notification)"
+          >
+
+            <div class="notification-icon">
+
+              <mat-icon>
+                {{
+                  notificationIcon(
+                    notification.type
+                  )
+                }}
+              </mat-icon>
+
+            </div>
+
+
+            <div class="notification-content">
+
+              <div class="notification-title">
+
+                {{ notification.title }}
+
+                @if (!notification.read) {
+
+                  <span
+                    class="unread-dot"
+                  ></span>
+
+                }
+
+              </div>
+
+
+              <div class="notification-message">
+
+                {{ notification.message }}
+
+              </div>
+
+
+              <div class="notification-time">
+
+                {{ formatNotificationTime(
+                  notification.createdAt
+                ) }}
+
+              </div>
+
+            </div>
+
+          </button>
+
+        }
+
+      </div>
+
+    }
+
+  </mat-menu>
+
+
+  <!-- ============================================================
+       USER PROFILE BUTTON
+       ============================================================ -->
+
+  <button
+    mat-button
+    type="button"
+    class="user-profile-btn"
+    [matMenuTriggerFor]="userMenu"
+    matTooltip="Account"
+    aria-label="Open user profile"
+  >
+
+    <div class="user-avatar">
+      {{ initials() }}
+    </div>
+
+
+    <div class="user-identity">
+
+      <span class="user-name">
+
+        {{ currentUser()?.firstName }}
+
+        {{ currentUser()?.lastName }}
+
+      </span>
+
+
+      <span class="user-role">
+
+        {{ currentUser()?.role }}
+
+      </span>
+
+    </div>
+
+
+    <mat-icon class="profile-chevron">
+      keyboard_arrow_down
+    </mat-icon>
+
+  </button>
+
+
+  <!-- ============================================================
+       USER PROFILE MENU
+       ============================================================ -->
+
+  <mat-menu
+    #userMenu="matMenu"
+    class="profile-menu"
+  >
+
+    <div
+      class="profile-header"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="profile-avatar">
+
+        {{ initials() }}
+
+      </div>
+
+
+      <div class="profile-details">
+
+        <div class="profile-name">
+
+          {{ currentUser()?.firstName }}
+
+          {{ currentUser()?.lastName }}
+
+        </div>
+
+
+        <div class="profile-role">
+
+          {{ currentUser()?.role }}
+
+        </div>
+
+      </div>
+
+
+      <div class="profile-status">
+
+        <span class="status-indicator"></span>
+
+        <span>
+          Online
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="profile-separator"></div>
+
+
+    <div class="profile-section-label">
+      ACCOUNT
+    </div>
+
+
+    <button
+      mat-menu-item
+      type="button"
+      class="profile-menu-item"
+      [routerLink]="['/profile']"
+    >
+
+      <mat-icon>
+        person_outline
+      </mat-icon>
+
+      <span>
+        Edit profile
+      </span>
+
+      <span class="item-hint">
+        Name &amp; contact info
+      </span>
+
+    </button>
+
+
+    <button
+      mat-menu-item
+      type="button"
+      class="profile-menu-item"
+      [routerLink]="['/profile']"
+      [queryParams]="{ tab: 'security' }"
+    >
+
+      <mat-icon>
+        lock_outline
+      </mat-icon>
+
+      <span>
+        Security
+      </span>
+
+      <span class="item-hint">
+        Change password
+      </span>
+
+    </button>
+
+
+    <div class="profile-separator"></div>
+
+
+    <button
+      mat-menu-item
+      type="button"
+      class="profile-menu-item sign-out-item"
+      (click)="logout()"
+    >
+
+      <mat-icon>
+        logout
+      </mat-icon>
+
+      <span>
+        Sign out
+      </span>
+
+    </button>
+
+  </mat-menu>
+
+</mat-toolbar>
+

@@ -1,0 +1,297 @@
+<div class="robot-control-page agdd-fade-in">
+
+  <!-- HEADER -->
+  <header class="robot-header">
+
+    <div class="title-area">
+
+      <div class="title-icon">
+        <mat-icon>precision_manufacturing</mat-icon>
+      </div>
+
+      <div>
+        <h1>Robot Control</h1>
+        <p>Robot operation and inspection control</p>
+      </div>
+
+    </div>
+
+    <!-- MODE SWITCH -->
+    <div class="mode-switch">
+
+      <button
+        type="button"
+        [class.active]="mode() === 'simulation'"
+        (click)="setMode('simulation')">
+
+        <mat-icon>smart_toy</mat-icon>
+        Simulation
+
+      </button>
+
+      <button
+        type="button"
+        [class.active]="mode() === 'real'"
+        (click)="setMode('real')">
+
+        <mat-icon>precision_manufacturing</mat-icon>
+        Real Robot
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- SYSTEM STATUS -->
+  <section
+    class="system-status"
+    [class]="robotStatusClass">
+
+    <div class="system-status-left">
+
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+      </div>
+
+      <div class="status-info">
+
+        <span class="status-caption">
+          ROBOT STATUS
+        </span>
+
+        <strong>
+          {{ robotStatusLabel }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="status-divider"></div>
+
+
+    <div class="system-status-right">
+
+      <mat-icon>
+        {{ pipelineIcon }}
+      </mat-icon>
+
+      <div>
+
+        <span class="status-caption">
+          PIPELINE
+        </span>
+
+        <strong>
+          {{ pipelineLabel }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- INSPECTION CAMERAS -->
+  <section class="camera-section">
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>Inspection Cameras</h2>
+
+        <p>
+          {{
+            mode() === 'simulation'
+              ? 'Simulation camera streams'
+              : 'Physical camera interfaces'
+          }}
+        </p>
+
+      </div>
+
+
+      <span class="mode-label">
+
+        {{
+          mode() === 'simulation'
+            ? 'SIMULATION'
+            : 'REAL ROBOT'
+        }}
+
+      </span>
+
+    </div>
+
+
+    <!--
+      Same camera components are used in both modes.
+      The cameraMode input changes the stream URL automatically.
+    -->
+    <div class="camera-grid">
+
+      <div class="camera-card">
+
+        <app-top-camera
+          [cameraMode]="mode()">
+        </app-top-camera>
+
+      </div>
+
+
+      <div class="camera-card">
+
+        <app-side-camera
+          [cameraMode]="mode()">
+        </app-side-camera>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ROBOT OPERATION -->
+  <section class="operation-section">
+
+    <div class="section-title">
+
+      <div>
+
+        <h2>Robot Operation</h2>
+
+        <p>
+          Control the active robot system
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="operation-panel">
+
+      <div class="operation-status">
+
+        <div
+          class="operation-icon"
+          [class]="robotStatusClass">
+
+          <mat-icon>
+            precision_manufacturing
+          </mat-icon>
+
+        </div>
+
+
+        <div>
+
+          <span class="status-caption">
+            SYSTEM STATUS
+          </span>
+
+          <strong>
+            {{ pipelineLabel }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- DYNAMIC START / STOP -->
+      <div class="operation-buttons">
+
+        @if (pipelineState() === 'running') {
+
+          <button
+            type="button"
+            class="stop-button"
+            [disabled]="busy()"
+            (click)="stopRobot()">
+
+            <mat-icon>stop</mat-icon>
+
+            STOP
+
+          </button>
+
+        } @else {
+
+          <button
+            type="button"
+            class="start-button"
+            [disabled]="mode() === 'real' || busy()"
+            (click)="startRobot()">
+
+            @if (pipelineState() === 'starting') {
+
+              <mat-icon class="spin">
+                sync
+              </mat-icon>
+
+              STARTING
+
+            } @else {
+
+              <mat-icon>
+                play_arrow
+              </mat-icon>
+
+              START
+
+            }
+
+          </button>
+
+        }
+
+      </div>
+
+    </div>
+
+
+    <!-- REAL ROBOT INFORMATION -->
+    @if (mode() === 'real') {
+
+      <div class="hardware-info">
+
+        <mat-icon>
+          info
+        </mat-icon>
+
+        <span>
+          Physical robot and cameras are ready for future integration.
+        </span>
+
+      </div>
+
+    }
+
+
+    <!-- ERROR -->
+    @if (errorMessage()) {
+
+      <div class="error-info">
+
+        <mat-icon>
+          error_outline
+        </mat-icon>
+
+        <span>
+          {{ errorMessage() }}
+        </span>
+
+      </div>
+
+    }
+
+  </section>
+
+</div>

@@ -1,0 +1,27 @@
+﻿# Dependencies
+**/node_modules/
+**/.angular/
+**/target/
+**/dist/
+
+# Git metadata inside copied projects
+**/.git/
+
+# Local environment and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/application.properties
+
+# Logs and temporary files
+**/*.log
+**/*.tmp
+**/*.bak
+**/*.before-*
+.DS_Store
+Thumbs.db
+
+# Review before publishing
+agdd-frontend-angular-updated-2/agdd/frontend/ANGULAR_AUTH_SETTINGS.txt
+agdd-frontend-angular-updated-2/agdd/frontend/ANGULAR_HEADER.txt
+agdd-frontend-angular-updated-2/agdd/frontend/src/assets/unity/StreamingAssets/config.json

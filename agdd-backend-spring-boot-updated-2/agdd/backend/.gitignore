@@ -1,0 +1,19 @@
+target/
+.mvn/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+*.iml
+.idea/
+.vscode/
+HELP.md
+src/main/resources/application.properties
+
+# Local documentation / backup files
+BACKEND_ALL_FILES.txt
+BACKEND_AUTH.txt
+BACKEND_INSPECTION.txt
+BACKEND_NOTIFICATIONS.txt
+*.backup
+*.bak
+pom.xml.backup-before-notifications

@@ -1,0 +1,155 @@
+<div class="profile-page">
+
+  <div class="page-header">
+
+    <div class="header-avatar">
+      {{ initials }}
+    </div>
+
+    <div class="header-text">
+      <h1>Account settings</h1>
+      <p>Manage your personal information and keep your account secure.</p>
+    </div>
+
+  </div>
+
+
+  @if (loadingProfile()) {
+
+    <div class="loading-state">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading your profile…</span>
+    </div>
+
+  } @else {
+
+    <mat-card class="settings-card">
+
+      <mat-tab-group [selectedIndex]="selectedTabIndex()" animationDuration="180ms">
+
+        <mat-tab label="Personal info">
+
+          <form [formGroup]="infoForm" (ngSubmit)="saveInfo()" class="tab-panel">
+
+            <p class="tab-description">
+              Update the name and email address associated with your account.
+            </p>
+
+            <div class="form-row">
+
+              <mat-form-field appearance="outline">
+                <mat-label>First name</mat-label>
+                <input matInput formControlName="firstName" autocomplete="given-name" />
+                @if (infoForm.get('firstName')?.hasError('required')) {
+                  <mat-error>First name is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Last name</mat-label>
+                <input matInput formControlName="lastName" autocomplete="family-name" />
+                @if (infoForm.get('lastName')?.hasError('required')) {
+                  <mat-error>Last name is required</mat-error>
+                }
+              </mat-form-field>
+
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Email address</mat-label>
+              <input matInput formControlName="email" autocomplete="email" />
+              <mat-icon matPrefix>mail_outline</mat-icon>
+              @if (infoForm.get('email')?.hasError('required')) {
+                <mat-error>Email is required</mat-error>
+              }
+              @if (infoForm.get('email')?.hasError('email')) {
+                <mat-error>Enter a valid email address</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button
+                mat-flat-button
+                color="primary"
+                type="submit"
+                [disabled]="savingInfo() || infoForm.invalid"
+              >
+                @if (savingInfo()) {
+                  <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                } @else {
+                  <mat-icon>save</mat-icon>
+                }
+                Save changes
+              </button>
+            </div>
+
+          </form>
+
+        </mat-tab>
+
+
+        <mat-tab label="Security">
+
+          <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="tab-panel">
+
+            <p class="tab-description">
+              Choose a strong password you don't use anywhere else.
+            </p>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Current password</mat-label>
+              <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
+              <mat-icon matPrefix>lock_outline</mat-icon>
+              @if (passwordForm.get('currentPassword')?.hasError('required')) {
+                <mat-error>Current password is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>New password</mat-label>
+              <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+              <mat-icon matPrefix>vpn_key</mat-icon>
+              @if (passwordForm.get('newPassword')?.hasError('required')) {
+                <mat-error>New password is required</mat-error>
+              }
+              @if (passwordForm.get('newPassword')?.hasError('minlength')) {
+                <mat-error>Use at least 8 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Confirm new password</mat-label>
+              <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+              <mat-icon matPrefix>vpn_key</mat-icon>
+              @if (passwordForm.hasError('passwordsMismatch') && passwordForm.get('confirmPassword')?.touched) {
+                <mat-error>Passwords do not match</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="form-actions">
+              <button
+                mat-flat-button
+                color="primary"
+                type="submit"
+                [disabled]="savingPassword() || passwordForm.invalid"
+              >
+                @if (savingPassword()) {
+                  <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                } @else {
+                  <mat-icon>shield</mat-icon>
+                }
+                Update password
+              </button>
+            </div>
+
+          </form>
+
+        </mat-tab>
+
+      </mat-tab-group>
+
+    </mat-card>
+
+  }
+
+</div>

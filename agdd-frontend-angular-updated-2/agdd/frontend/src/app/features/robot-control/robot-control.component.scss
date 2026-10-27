@@ -1,0 +1,655 @@
+﻿.robot-control-page {
+  padding: 24px;
+  min-height: 100%;
+}
+
+
+/* ========================================
+   HEADER
+======================================== */
+
+.robot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.title-area {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.title-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.045);
+}
+
+.title-icon mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  opacity: 0.85;
+}
+
+h1 {
+  margin: 0;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.title-area p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+
+/* ========================================
+   MODE SWITCH
+======================================== */
+
+.mode-switch {
+  display: flex;
+
+  padding: 3px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px;
+
+  background: rgba(255,255,255,0.025);
+}
+
+.mode-switch button {
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 0 14px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 11px;
+
+  opacity: 0.55;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.mode-switch button.active {
+  background: rgba(255,255,255,0.09);
+  opacity: 1;
+}
+
+.mode-switch button mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+
+/* ========================================
+   SYSTEM STATUS
+======================================== */
+
+.system-status {
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 22px;
+
+  margin-bottom: 26px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+
+  background: rgba(255,255,255,0.025);
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+
+/* RUNNING */
+
+.system-status.online {
+  border-color: rgba(55,190,110,0.28);
+  background: rgba(55,190,110,0.045);
+}
+
+
+/* STARTING */
+
+.system-status.starting {
+  border-color: rgba(220,165,60,0.28);
+  background: rgba(220,165,60,0.045);
+}
+
+
+/* ERROR */
+
+.system-status.error {
+  border-color: rgba(210,70,80,0.3);
+  background: rgba(210,70,80,0.045);
+}
+
+
+.system-status-left,
+.system-status-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.status-indicator {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.04);
+}
+
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #777;
+}
+
+
+.system-status.online .status-dot {
+  background: #42d477;
+
+  box-shadow:
+    0 0 0 4px rgba(66,212,119,0.10),
+    0 0 12px rgba(66,212,119,0.45);
+}
+
+
+.system-status.starting .status-dot {
+  background: #dca53c;
+
+  box-shadow:
+    0 0 0 4px rgba(220,165,60,0.10),
+    0 0 12px rgba(220,165,60,0.35);
+}
+
+
+.system-status.error .status-dot {
+  background: #d95b63;
+
+  box-shadow:
+    0 0 0 4px rgba(217,91,99,0.10);
+}
+
+
+.status-info strong,
+.system-status-right strong {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+.status-caption {
+  display: block;
+
+  font-size: 9px;
+  letter-spacing: 1px;
+
+  opacity: 0.45;
+}
+
+
+.status-divider {
+  width: 1px;
+  height: 32px;
+
+  margin: 0 32px;
+
+  background: rgba(255,255,255,0.08);
+}
+
+
+.system-status-right mat-icon {
+  opacity: 0.6;
+}
+
+
+/* ========================================
+   SECTION
+======================================== */
+
+.camera-section,
+.operation-section {
+  margin-bottom: 26px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 11px;
+}
+
+.section-title h2 {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.section-title p {
+  margin: 3px 0 0;
+
+  font-size: 10px;
+  opacity: 0.45;
+}
+
+.mode-label {
+  padding: 5px 8px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px;
+
+  font-size: 8px;
+  letter-spacing: 1px;
+
+  opacity: 0.55;
+}
+
+
+/* ========================================
+   CAMERAS
+======================================== */
+
+.camera-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px;
+}
+
+.camera-card {
+  min-width: 0;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 11px;
+
+  background: rgba(255,255,255,0.025);
+}
+
+
+/* ========================================
+   REAL CAMERA
+======================================== */
+
+.hardware-camera {
+  min-height: 250px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 11px;
+
+  background: rgba(255,255,255,0.025);
+}
+
+
+.hardware-camera > mat-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px;
+
+  border-radius: 9px;
+
+  background: rgba(255,255,255,0.045);
+
+  opacity: 0.55;
+}
+
+
+.hardware-camera strong {
+  display: block;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hardware-camera span {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 10px;
+
+  opacity: 0.45;
+}
+
+
+/* ========================================
+   OPERATION
+======================================== */
+
+.operation-panel {
+  min-height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 18px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 11px;
+
+  background: rgba(255,255,255,0.025);
+}
+
+
+.operation-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.operation-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  background: rgba(255,255,255,0.04);
+}
+
+
+.operation-icon mat-icon {
+  font-size: 21px;
+  width: 21px;
+  height: 21px;
+
+  opacity: 0.6;
+}
+
+
+.operation-icon.online mat-icon {
+  color: #42d477;
+  opacity: 1;
+}
+
+
+.operation-icon.starting mat-icon {
+  color: #dca53c;
+  opacity: 1;
+}
+
+
+.operation-icon.error mat-icon {
+  color: #d95b63;
+  opacity: 1;
+}
+
+
+.operation-status strong {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 13px;
+}
+
+
+/* ========================================
+   BUTTONS
+======================================== */
+
+.operation-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.operation-buttons button {
+  min-width: 94px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  border: 0;
+  border-radius: 6px;
+
+  color: white;
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.15s ease;
+}
+
+.operation-buttons button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.operation-buttons button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.start-button {
+  background: #267a52;
+}
+
+.stop-button {
+  background: #873d45;
+}
+
+.operation-buttons mat-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+}
+
+
+/* ========================================
+   INFO / ERROR
+======================================== */
+
+.hardware-info,
+.error-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 9px;
+  padding: 9px 12px;
+
+  border-radius: 7px;
+
+  font-size: 10px;
+}
+
+.hardware-info {
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.02);
+
+  opacity: 0.6;
+}
+
+.error-info {
+  border: 1px solid rgba(210,70,80,0.2);
+  background: rgba(210,70,80,0.05);
+}
+
+.hardware-info mat-icon,
+.error-info mat-icon {
+  font-size: 17px;
+  width: 17px;
+  height: 17px;
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+
+  .robot-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mode-switch {
+    width: 100%;
+  }
+
+  .mode-switch button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .camera-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 650px) {
+
+  .robot-control-page {
+    padding: 16px;
+  }
+
+  .system-status {
+    padding: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .status-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+  }
+
+  .operation-panel {
+    padding: 15px;
+
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 15px;
+  }
+
+  .operation-buttons {
+    width: 100%;
+  }
+
+  .operation-buttons button {
+    flex: 1;
+  }
+}
+
+/* STARTING state */
+.starting-button mat-icon {
+  animation: robot-spin 1s linear infinite;
+}
+
+@keyframes robot-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* STARTING state */
+.starting-button mat-icon {
+  animation: robot-spin 1s linear infinite;
+}
+
+@keyframes robot-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: robot-spin 1s linear infinite;
+}
+
+@keyframes robot-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

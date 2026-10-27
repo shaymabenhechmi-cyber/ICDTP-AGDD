@@ -1,0 +1,79 @@
+<div class="login-page">
+  <div class="login-panel-left">
+    <div class="brand">
+      <mat-icon class="brand-icon">precision_manufacturing</mat-icon>
+      <h1>AGDD</h1>
+      <p>Automated Gear Defect Detection</p>
+    </div>
+    <p class="tagline">Intelligent industrial quality control platform — Computer vision, robotics and digital twin.</p>
+  </div>
+
+  <div class="login-panel-right">
+    <mat-card class="login-card agdd-fade-in">
+      <h2>Create Account</h2>
+      <p class="subtitle">Join the AGDD platform</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="name-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" autocomplete="given-name">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" autocomplete="family-name">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" autocomplete="username">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email">
+          <mat-icon matSuffix>mail</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
+          <button mat-icon-button matSuffix type="button" (click)="togglePassword()">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input matInput [type]="hideConfirmPassword() ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
+          <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPassword()">
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        @if (form.errors?.['passwordMismatch'] && form.get('confirmPassword')?.touched) {
+          <p class="error-text">Passwords do not match.</p>
+        }
+
+        @if (errorMessage()) {
+          <p class="error-text">{{ errorMessage() }}</p>
+        }
+
+        <button mat-flat-button color="primary" class="full-width login-btn" type="submit" [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="20" style="display:inline-block; margin-right:8px;"></mat-spinner>
+          }
+          Create Account
+        </button>
+
+        <p class="signup-hint">
+          Already have an account?
+          <a routerLink="/login">Sign in</a>
+        </p>
+      </form>
+    </mat-card>
+  </div>
+</div>

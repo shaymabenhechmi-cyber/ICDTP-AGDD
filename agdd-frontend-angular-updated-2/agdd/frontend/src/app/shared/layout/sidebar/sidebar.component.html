@@ -1,0 +1,50 @@
+﻿<div class="sidebar">
+
+  <div class="sidebar-logo">
+    <mat-icon>precision_manufacturing</mat-icon>
+    <span>AGDD</span>
+  </div>
+
+  <mat-nav-list class="sidebar-nav">
+
+    @for (item of menuItems(); track item.route) {
+
+      <a
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active-link">
+
+        <mat-icon matListItemIcon>
+          {{ item.icon }}
+        </mat-icon>
+
+        <span matListItemTitle>
+          {{ item.label }}
+        </span>
+
+      </a>
+
+    }
+
+  </mat-nav-list>
+
+  <div class="sidebar-footer">
+
+    <a
+      mat-list-item
+      (click)="logout()"
+      class="logout-link">
+
+      <mat-icon matListItemIcon>
+        logout
+      </mat-icon>
+
+      <span matListItemTitle>
+        Logout
+      </span>
+
+    </a>
+
+  </div>
+
+</div>

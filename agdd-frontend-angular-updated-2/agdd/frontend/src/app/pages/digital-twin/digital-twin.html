@@ -1,0 +1,362 @@
+<!-- =========================================================
+     UNITY DIGITAL TWIN
+     ========================================================= -->
+
+<div class="unity-panel">
+
+  <!-- Your existing Unity HTML stays here -->
+
+  <div class="unity-container">
+    <canvas
+      #unityCanvas
+      class="unity-canvas">
+    </canvas>
+
+    @if (loading()) {
+      <div class="unity-loading">
+
+        <div class="unity-loading-title">
+          Loading Digital Twin
+        </div>
+
+        <div class="unity-progress">
+          <div
+            class="unity-progress-bar"
+            [style.width.%]="loadProgress()">
+          </div>
+        </div>
+
+        <span>
+          {{ loadProgress() }}%
+        </span>
+
+      </div>
+    }
+
+    @if (errorMsg()) {
+      <div class="unity-error">
+        <mat-icon>error_outline</mat-icon>
+
+        <span>
+          {{ errorMsg() }}
+        </span>
+
+        <button
+          mat-stroked-button
+          (click)="retry()">
+          Retry
+        </button>
+      </div>
+    }
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     REAL ROBOT STATUS
+     ========================================================= -->
+
+<article class="robot-status-panel">
+
+  <div class="panel-header">
+
+    <div>
+
+      <span>
+        REAL ROBOT
+      </span>
+
+      <h2>
+        Live robot status
+      </h2>
+
+    </div>
+
+    <div
+      class="robot-badge"
+      [class]="robotStatusClass()">
+
+      <span></span>
+
+      {{ robotStatus() }}
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       ROBOT SUMMARY
+       ======================================================= -->
+
+  <div class="robot-content">
+
+    <div class="robot-main">
+
+      <div
+        class="robot-circle"
+        [class]="robotStatusClass()">
+
+        @if (robotStatus() === 'RUNNING') {
+          ▶
+        } @else if (robotStatus() === 'PARTIAL') {
+          !
+        } @else {
+          Ⅱ
+        }
+
+      </div>
+
+
+      <div>
+
+        <strong>
+          {{ robotState() | uppercase }}
+        </strong>
+
+        <p>
+          {{ robotMessage() }}
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="robot-info">
+
+      <div>
+
+        <span>
+          Services
+        </span>
+
+        <strong>
+          {{ runningServices() }}/{{ robotServices().length }}
+        </strong>
+
+      </div>
+
+
+      <div>
+
+        <span>
+          Current step
+        </span>
+
+        <strong>
+          {{ normalizedRobotStep() || 'IDLE' }}
+        </strong>
+
+      </div>
+
+
+      <div>
+
+        <span>
+          Progress
+        </span>
+
+        <strong>
+          {{ pipelineProgress() | number:'1.0-0' }}%
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       PIPELINE
+       ======================================================= -->
+
+  <div class="pipeline">
+
+    <div class="pipeline-header">
+
+      <span>
+        INSPECTION PIPELINE
+      </span>
+
+      <strong>
+        {{ pipelineProgress() | number:'1.0-0' }}%
+      </strong>
+
+    </div>
+
+
+    <div class="pipeline-steps">
+
+      @for (
+        step of pipelineSteps;
+        track step
+      ) {
+
+        <div
+          class="pipeline-step"
+          [class.active]="isPipelineActive(step)"
+          [class.complete]="isPipelineComplete(step)">
+
+          <div class="step-circle">
+
+            @if (isPipelineComplete(step)) {
+              ✓
+            } @else {
+              {{ $index + 1 }}
+            }
+
+          </div>
+
+          <span>
+            {{ step }}
+          </span>
+
+        </div>
+
+      }
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       REAL ROBOT SERVICES
+       ======================================================= -->
+
+  <div class="services">
+
+    @for (
+      service of robotServices();
+      track service.name
+    ) {
+
+      <div class="service">
+
+        <span
+          class="service-dot"
+          [class.running]="service.running">
+        </span>
+
+        <span>
+          {{ service.name }}
+        </span>
+
+        <strong>
+          {{ service.running ? 'RUNNING' : 'STOPPED' }}
+        </strong>
+
+      </div>
+
+    }
+
+  </div>
+
+
+  <!-- =======================================================
+       ROBOT ERROR
+       ======================================================= -->
+
+  @if (robotError()) {
+
+    <div class="robot-error">
+
+      <mat-icon>
+        error_outline
+      </mat-icon>
+
+      {{ robotError() }}
+
+    </div>
+
+  }
+
+
+  <!-- =======================================================
+       START / STOP
+       ======================================================= -->
+
+  <div class="pipeline-controls">
+
+    <div class="pipeline-state">
+
+      <span
+        class="status-dot"
+        [class.on]="pipelineRunning()">
+      </span>
+
+      <span class="status-label">
+
+        {{
+          pipelineRunning()
+            ? 'Pipeline running'
+            : 'Pipeline stopped'
+        }}
+
+      </span>
+
+    </div>
+
+
+    <div class="pipeline-buttons">
+
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="
+          pipelineBusy() ||
+          pipelineRunning()
+        "
+        (click)="startPipeline()">
+
+        <mat-icon>
+          play_arrow
+        </mat-icon>
+
+        Start
+
+      </button>
+
+
+      <button
+        mat-stroked-button
+        color="warn"
+        [disabled]="
+          pipelineBusy() ||
+          !pipelineRunning()
+        "
+        (click)="stopPipeline()">
+
+        <mat-icon>
+          stop
+        </mat-icon>
+
+        Stop
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  @if (pipelineError()) {
+
+    <div class="pipeline-error">
+
+      <mat-icon>
+        error_outline
+      </mat-icon>
+
+      <span>
+        {{ pipelineError() }}
+      </span>
+
+    </div>
+
+  }
+
+</article>

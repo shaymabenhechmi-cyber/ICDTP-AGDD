@@ -1,0 +1,909 @@
+﻿<div class="dashboard">
+
+  <!-- HEADER -->
+
+  <header class="dashboard-header">
+
+    <div>
+
+      <span class="eyebrow">
+        AGDD / INDUSTRIAL QUALITY CONTROL
+      </span>
+
+      <h1>
+        Inspection Dashboard
+      </h1>
+
+      <p>
+        Real-time monitoring of inspection and robot activity
+      </p>
+
+    </div>
+
+
+    <div class="header-right">
+
+      <div class="live-status">
+
+        <span class="live-dot"></span>
+
+        <span>
+          LIVE
+        </span>
+
+      </div>
+
+      <div class="clock">
+        {{ currentTime() | date:'HH:mm:ss' }}
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ERROR -->
+
+  @if (error()) {
+
+    <div class="error-banner">
+      {{ error() }}
+    </div>
+
+  }
+
+
+  <!-- TOOLBAR -->
+
+  <section class="toolbar">
+
+    <div class="toolbar-title">
+
+      <span>
+        INSPECTION PERIOD
+      </span>
+
+      <strong>
+        {{
+          selectedRange() === '1h'
+            ? 'Last hour'
+            : selectedRange() === 'today'
+              ? 'Today'
+              : selectedRange() === '24h'
+                ? 'Last 24 hours'
+                : selectedRange() === '7d'
+                  ? 'Last 7 days'
+                  : 'Last 30 days'
+        }}
+      </strong>
+
+    </div>
+
+
+    <div class="ranges">
+
+      <button
+        [class.active]="selectedRange() === '1h'"
+        (click)="setRange('1h')">
+        1H
+      </button>
+
+      <button
+        [class.active]="selectedRange() === 'today'"
+        (click)="setRange('today')">
+        TODAY
+      </button>
+
+      <button
+        [class.active]="selectedRange() === '24h'"
+        (click)="setRange('24h')">
+        24H
+      </button>
+
+      <button
+        [class.active]="selectedRange() === '7d'"
+        (click)="setRange('7d')">
+        7D
+      </button>
+
+      <button
+        [class.active]="selectedRange() === '30d'"
+        (click)="setRange('30d')">
+        30D
+      </button>
+
+    </div>
+
+
+    <div class="toolbar-right">
+
+      <span class="updated">
+        {{ dashboardAutoRefresh() ? 'Auto refresh' : 'Refresh off' }}
+        ·
+        {{ lastUpdate() | date:'HH:mm:ss' }}
+      </span>
+
+      <button
+        class="export-button"
+        [disabled]="!activity.length"
+        (click)="exportExcel()">
+
+        ↓ Export Excel
+
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- KPI -->
+
+  <section class="kpis">
+
+    <article class="kpi">
+
+      <span>Total inspected</span>
+
+      <strong>
+        {{ totalInspected() }}
+      </strong>
+
+      <small>
+        Confirmed inspections
+      </small>
+
+    </article>
+
+
+    <article class="kpi healthy">
+
+      <span>Healthy</span>
+
+      <strong>
+        {{ healthyCount() }}
+      </strong>
+
+      <small>
+        Conforming gears
+      </small>
+
+    </article>
+
+
+    <article class="kpi defective">
+
+      <span>Defective</span>
+
+      <strong>
+        {{ defectiveCount() }}
+      </strong>
+
+      <small>
+        Rejected gears
+      </small>
+
+    </article>
+
+
+    <article class="kpi uncertain">
+
+      <span>Uncertain</span>
+
+      <strong>
+        {{ uncertainCount() }}
+      </strong>
+
+      <small>
+        Requires attention
+      </small>
+
+    </article>
+
+
+    <article class="kpi quality">
+
+      <span>Conformity</span>
+
+      <strong>
+        {{ conformityRate() | number:'1.1-1' }}%
+      </strong>
+
+      <small>
+        Healthy / confirmed
+      </small>
+
+    </article>
+
+  </section>
+
+
+  <!-- ROBOT -->
+
+  <section class="main-grid">
+
+
+    <article class="panel robot-panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <span>
+            ROBOT
+          </span>
+
+          <h2>
+            Real-time robot status
+          </h2>
+
+        </div>
+
+
+        <div
+          class="robot-badge"
+          [class]="robotStatusClass()">
+
+          <span></span>
+
+          {{ robotStatus() }}
+
+        </div>
+
+      </div>
+
+
+      <div class="robot-content">
+
+        <div class="robot-main">
+
+          <div
+            class="robot-circle"
+            [class]="robotStatusClass()">
+
+            {{
+              robotStatus() === 'RUNNING'
+                ? '▶'
+                : 'Ⅱ'
+            }}
+
+          </div>
+
+
+          <div>
+
+            <strong>
+              {{ robotState() | uppercase }}
+            </strong>
+
+            <p>
+              {{ robotMessage() }}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="robot-info">
+
+          <div>
+            <span>Services</span>
+
+            <strong>
+              {{ runningServices() }}/{{ robotServices().length }}
+            </strong>
+          </div>
+
+
+          <div>
+            <span>Current step</span>
+
+            <strong>
+              {{ normalizedRobotStep() || 'IDLE' }}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- PIPELINE -->
+
+      <div class="pipeline">
+
+        <div class="pipeline-header">
+
+          <span>
+            INSPECTION PIPELINE
+          </span>
+
+          <strong>
+            {{ pipelineProgress() | number:'1.0-0' }}%
+          </strong>
+
+        </div>
+
+
+        <div class="pipeline-steps">
+
+          @for (
+            step of pipelineSteps;
+            track step
+          ) {
+
+            <div
+              class="pipeline-step"
+              [class.active]="isPipelineActive(step)"
+              [class.complete]="isPipelineComplete(step)">
+
+              <div class="step-circle">
+
+                @if (isPipelineComplete(step)) {
+                  ✓
+                } @else {
+                  {{ $index + 1 }}
+                }
+
+              </div>
+
+              <span>
+                {{ step }}
+              </span>
+
+            </div>
+
+          }
+
+        </div>
+
+      </div>
+
+
+      <!-- SERVICES -->
+
+      <div class="services">
+
+        @for (
+          service of robotServices();
+          track service.name
+        ) {
+
+          <div class="service">
+
+            <span
+              class="service-dot"
+              [class.running]="service.running">
+            </span>
+
+            <span>
+              {{ service.name }}
+            </span>
+
+            <strong>
+              {{ service.running ? 'RUNNING' : 'STOPPED' }}
+            </strong>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      @if (robotError()) {
+
+        <div class="robot-error">
+          {{ robotError() }}
+        </div>
+
+      }
+
+    </article>
+
+  </section>
+
+
+  <!-- ANALYTICS -->
+
+  <section class="analytics">
+
+
+    <!-- TREND -->
+
+    <article class="panel trend-panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <span>
+            TREND
+          </span>
+
+          <h2>
+            Inspection volume
+          </h2>
+
+        </div>
+
+
+        <div class="legend">
+
+          <span>
+            <i class="healthy-dot"></i>
+            Healthy
+          </span>
+
+          <span>
+            <i class="defective-dot"></i>
+            Defective
+          </span>
+
+        </div>
+
+      </div>
+
+
+      @if (getTrend().length) {
+
+        <div class="chart">
+
+          @for (
+            item of getTrend();
+            track $index
+          ) {
+
+            <div class="chart-column">
+
+              <div class="bars">
+
+                <div
+                  class="bar healthy-bar"
+                  [style.height]="
+                    getTrendHeight(
+                      getTrendHealthy(item)
+                    )
+                  ">
+                </div>
+
+                <div
+                  class="bar defective-bar"
+                  [style.height]="
+                    getTrendHeight(
+                      getTrendDefective(item)
+                    )
+                  ">
+                </div>
+
+              </div>
+
+              <span>
+                {{ getTrendLabel(item) }}
+              </span>
+
+            </div>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <div class="empty">
+          No trend data.
+        </div>
+
+      }
+
+    </article>
+
+
+    <!-- QUALITY -->
+
+    <article class="panel quality-panel">
+
+      <div class="panel-header">
+
+        <div>
+
+          <span>
+            QUALITY
+          </span>
+
+          <h2>
+            Distribution
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="quality-content">
+
+        <div
+          class="donut"
+          [style.background]="
+            'conic-gradient(' +
+            'var(--healthy) 0 ' +
+            healthyPercentage() + '%, ' +
+
+            'var(--defective) ' +
+            healthyPercentage() + '% ' +
+            (
+              healthyPercentage() +
+              defectivePercentage()
+            ) + '%, ' +
+
+            'var(--uncertain) ' +
+            (
+              healthyPercentage() +
+              defectivePercentage()
+            ) + '% 100%)'
+          ">
+
+          <div class="donut-center">
+
+            <strong>
+              {{ qualityTotal() }}
+            </strong>
+
+            <span>
+              records
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="quality-list">
+
+          <div>
+
+            <span>
+              <i class="healthy-dot"></i>
+              Healthy
+            </span>
+
+            <strong>
+              {{ healthyCount() }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              <i class="defective-dot"></i>
+              Defective
+            </span>
+
+            <strong>
+              {{ defectiveCount() }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              <i class="uncertain-dot"></i>
+              Uncertain
+            </span>
+
+            <strong>
+              {{ uncertainCount() }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </section>
+
+
+  <!-- RECENT INSPECTIONS -->
+
+  <section class="panel inspections-panel">
+
+    <div class="panel-header">
+
+      <div>
+
+        <span>
+          HISTORY
+        </span>
+
+        <h2>
+          Recent inspections
+        </h2>
+
+      </div>
+
+      <strong class="record-count">
+        {{ activity.length }} records
+      </strong>
+
+    </div>
+
+
+    @if (activity.length) {
+
+      <div class="table-container">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Inspection</th>
+              <th>Gear ID</th>
+              <th>Status</th>
+              <th>Inspected at</th>
+              <th>Top</th>
+              <th>Side</th>
+              <th></th>
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (item of paginatedActivity(); track $index) {
+
+              <tr
+                (click)="selectInspection(item)">
+
+                <td>
+                  <strong class="inspection-id">
+                    {{ getActivityId(item) }}
+                  </strong>
+                </td>
+
+                <td>
+                  {{ getPieceId(item) }}
+                </td>
+
+                <td>
+
+                  <span
+                    class="status"
+                    [class]="
+                      getStatusClass(item)
+                    ">
+
+                    {{ getStatus(item) }}
+
+                  </span>
+
+                </td>
+
+                <td>
+                  {{ item.inspectedAt || '—' }}
+                </td>
+
+                <td>
+                  {{ item.topStatus || '—' }}
+                </td>
+
+                <td>
+                  {{ item.sideStatus || '—' }}
+                </td>
+
+                <td>
+                  →
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div class="history-pagination">
+        <div class="items-per-page">
+          <span>Items per page:</span>
+          <select
+            [value]="pageSize()"
+            (change)="setPageSize(+$any($event.target).value)">
+            @for (size of pageSizeOptions; track size) {
+              <option [value]="size">{{ size }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="pagination-info">
+          {{ paginationStart() }} – {{ paginationEnd() }} of {{ activity.length }}
+        </div>
+
+        <div class="pagination-buttons">
+          <button
+            type="button"
+            [disabled]="currentPage() === 1"
+            (click)="previousPage()"
+            aria-label="Previous page">
+            ‹
+          </button>
+
+          <button
+            type="button"
+            [disabled]="currentPage() === totalPages()"
+            (click)="nextPage()"
+            aria-label="Next page">
+            ›
+          </button>
+        </div>
+      </div>
+
+    } @else {
+
+      <div class="empty">
+        No inspections for this period.
+      </div>
+
+    }
+
+  </section>
+
+
+  <!-- DETAILS -->
+
+  @if (selectedInspection()) {
+
+    <div
+      class="overlay"
+      (click)="closeInspection()">
+
+      <aside
+        class="drawer"
+        (click)="$event.stopPropagation()">
+
+        <div class="drawer-header">
+
+          <div>
+
+            <span>
+              INSPECTION DETAILS
+            </span>
+
+            <h2>
+              {{ getActivityId(selectedInspection()!) }}
+            </h2>
+
+          </div>
+
+
+          <button
+            class="close"
+            (click)="closeInspection()">
+
+            ×
+
+          </button>
+
+        </div>
+
+
+        <div class="drawer-status">
+
+          <span
+            class="status"
+            [class]="
+              getStatusClass(
+                selectedInspection()!
+              )
+            ">
+
+            {{ getStatus(selectedInspection()!) }}
+
+          </span>
+
+        </div>
+
+
+        <div class="measurements">
+
+          <div>
+            <span>Gear ID</span>
+            <strong>
+              {{ getPieceId(selectedInspection()!) }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Outer diameter</span>
+            <strong>
+              {{ selectedInspection()!.outerDiameter ?? '—' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Inner diameter</span>
+            <strong>
+              {{ selectedInspection()!.innerDiameter ?? '—' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Teeth</span>
+            <strong>
+              {{ selectedInspection()!.teethCount ?? '—' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Height</span>
+            <strong>
+              {{ selectedInspection()!.heightMm ?? '—' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Helix</span>
+            <strong>
+              {{ selectedInspection()!.helixDeg ?? '—' }}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="camera-results">
+
+          <h3>
+            Camera results
+          </h3>
+
+          <div>
+            <span>Top</span>
+            <strong>
+              {{ selectedInspection()!.topStatus || '—' }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Side</span>
+            <strong>
+              {{ selectedInspection()!.sideStatus || '—' }}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div class="drawer-time">
+
+          <span>
+            Inspected at
+          </span>
+
+          <strong>
+            {{ selectedInspection()!.inspectedAt || '—' }}
+          </strong>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  }
+
+</div>
+
+
+

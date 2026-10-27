@@ -1,0 +1,726 @@
+<div class="settings-detail agdd-fade-in">
+
+  <!-- HEADER -->
+  <div class="detail-header">
+
+    <button
+      mat-icon-button
+      class="back-btn"
+      routerLink="/settings">
+
+      <mat-icon>
+        arrow_back
+      </mat-icon>
+
+    </button>
+
+    <div>
+
+      <h1>
+        Camera Settings
+      </h1>
+
+      <p>
+        Configure display and image parameters for the
+        top and side inspection cameras.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  @if (loading()) {
+
+    <!-- LOADING -->
+
+    <div class="loading-state">
+
+      <mat-icon class="spin">
+        autorenew
+      </mat-icon>
+
+      <p>
+        Loading settings...
+      </p>
+
+    </div>
+
+  } @else {
+
+    <div class="settings-form">
+
+
+      <!-- ========================================= -->
+      <!-- CAMERA SELECTOR -->
+      <!-- ========================================= -->
+
+      <mat-button-toggle-group
+        class="camera-switch"
+
+        [value]="settings().activeCamera"
+
+        (change)="
+          update('activeCamera', $event.value)
+        ">
+
+        <mat-button-toggle value="top">
+
+          <mat-icon>
+            photo_camera
+          </mat-icon>
+
+          Top Camera
+
+        </mat-button-toggle>
+
+
+        <mat-button-toggle value="side">
+
+          <mat-icon>
+            camera_alt
+          </mat-icon>
+
+          Side Camera
+
+        </mat-button-toggle>
+
+      </mat-button-toggle-group>
+
+
+      <!-- ========================================= -->
+<!-- STREAM LINKS -->
+<!-- ========================================= -->
+
+<div class="agdd-card form-section">
+
+  <h3>
+    <mat-icon>link</mat-icon>
+    Stream Links
+  </h3>
+
+  <div class="camera-info">
+    <mat-icon>
+      {{ settings().activeCamera === 'top' ? 'photo_camera' : 'camera_alt' }}
+    </mat-icon>
+    <span>
+      {{ settings().activeCamera === 'top' ? 'Top Camera' : 'Side Camera' }}
+    </span>
+  </div>
+
+  <!-- SIMULATION URL -->
+  <div class="field-row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Simulation stream URL</mat-label>
+
+      <input
+        matInput
+        #simInput
+        type="url"
+        placeholder="http://localhost:55000/video_feed"
+        [value]="
+          (settings().activeCamera === 'top'
+            ? settings().topSimulationUrl
+            : settings().sideSimulationUrl) ?? ''
+        "
+        (input)="
+          settings().activeCamera === 'top'
+            ? update('topSimulationUrl', simInput.value)
+            : update('sideSimulationUrl', simInput.value)
+        ">
+    </mat-form-field>
+  </div>
+
+  <!-- REAL URL -->
+  <div class="field-row">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Real camera stream URL</mat-label>
+
+      <input
+        matInput
+        #realInput
+        type="url"
+        placeholder="http://192.168.1.50:8080/stream"
+        [value]="
+          (settings().activeCamera === 'top'
+            ? settings().topRealUrl
+            : settings().sideRealUrl) ?? ''
+        "
+        (input)="
+          settings().activeCamera === 'top'
+            ? update('topRealUrl', realInput.value)
+            : update('sideRealUrl', realInput.value)
+        ">
+    </mat-form-field>
+  </div>
+
+</div>
+      <!-- ========================================= -->
+      <!-- CAMERA FRAME -->
+      <!-- ========================================= -->
+
+      <div class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            crop_free
+          </mat-icon>
+
+          Camera Frame
+
+        </h3>
+
+
+        <!-- CURRENT CAMERA -->
+        <div class="camera-info">
+
+          <mat-icon>
+
+            {{
+              settings().activeCamera === 'top'
+                ? 'photo_camera'
+                : 'camera_alt'
+            }}
+
+          </mat-icon>
+
+          <span>
+
+            {{
+              settings().activeCamera === 'top'
+                ? 'Top Camera'
+                : 'Side Camera'
+            }}
+
+          </span>
+
+        </div>
+
+
+        <!-- ===================================== -->
+        <!-- ZOOM -->
+        <!-- ===================================== -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Zoom
+            </span>
+
+            <span class="field-value">
+
+              {{
+                settings().activeCamera === 'top'
+                  ? settings().topZoom
+                  : settings().sideZoom
+              }}%
+
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="50"
+            max="200"
+            step="5"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().activeCamera === 'top'
+                  ? settings().topZoom
+                  : settings().sideZoom
+              "
+
+              (valueChange)="
+
+                settings().activeCamera === 'top'
+
+                  ? update(
+                      'topZoom',
+                      $event
+                    )
+
+                  : update(
+                      'sideZoom',
+                      $event
+                    )
+
+              ">
+
+          </mat-slider>
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- FRAME WIDTH -->
+        <!-- ===================================== -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Frame width
+            </span>
+
+            <span class="field-value">
+
+              {{
+                settings().activeCamera === 'top'
+                  ? settings().topFrameWidth
+                  : settings().sideFrameWidth
+              }}%
+
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="40"
+            max="100"
+            step="5"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().activeCamera === 'top'
+                  ? settings().topFrameWidth
+                  : settings().sideFrameWidth
+              "
+
+              (valueChange)="
+
+                settings().activeCamera === 'top'
+
+                  ? update(
+                      'topFrameWidth',
+                      $event
+                    )
+
+                  : update(
+                      'sideFrameWidth',
+                      $event
+                    )
+
+              ">
+
+          </mat-slider>
+
+        </div>
+
+
+
+        <!-- ===================================== -->
+        <!-- FRAME HEIGHT -->
+        <!-- ===================================== -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Frame height
+            </span>
+
+            <span class="field-value">
+
+              {{
+                settings().activeCamera === 'top'
+                  ? settings().topFrameHeight
+                  : settings().sideFrameHeight
+              }}vh
+
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="30"
+            max="90"
+            step="5"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().activeCamera === 'top'
+                  ? settings().topFrameHeight
+                  : settings().sideFrameHeight
+              "
+
+              (valueChange)="
+
+                settings().activeCamera === 'top'
+
+                  ? update(
+                      'topFrameHeight',
+                      $event
+                    )
+
+                  : update(
+                      'sideFrameHeight',
+                      $event
+                    )
+
+              ">
+
+          </mat-slider>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ========================================= -->
+      <!-- IMAGE ADJUSTMENTS -->
+      <!-- ========================================= -->
+
+      <div class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            tune
+          </mat-icon>
+
+          Image Adjustments
+
+        </h3>
+
+
+        <!-- BRIGHTNESS -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Brightness
+            </span>
+
+            <span class="field-value">
+              {{ settings().brightness }}%
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="0"
+            max="100"
+            step="1"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().brightness
+              "
+
+              (valueChange)="
+                update(
+                  'brightness',
+                  $event
+                )
+              ">
+
+          </mat-slider>
+
+        </div>
+
+
+
+        <!-- CONTRAST -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Contrast
+            </span>
+
+            <span class="field-value">
+              {{ settings().contrast }}%
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="0"
+            max="100"
+            step="1"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().contrast
+              "
+
+              (valueChange)="
+                update(
+                  'contrast',
+                  $event
+                )
+              ">
+
+          </mat-slider>
+
+        </div>
+
+
+
+        <!-- EXPOSURE -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Exposure
+            </span>
+
+            <span class="field-value">
+              {{ settings().exposure }}%
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="0"
+            max="100"
+            step="1"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().exposure
+              "
+
+              (valueChange)="
+                update(
+                  'exposure',
+                  $event
+                )
+              ">
+
+          </mat-slider>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ========================================= -->
+      <!-- VIDEO STREAM -->
+      <!-- ========================================= -->
+
+      <div class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            settings_display
+          </mat-icon>
+
+          Video Stream
+
+        </h3>
+
+
+        <!-- RESOLUTION -->
+
+        <div class="field-row">
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Resolution
+            </mat-label>
+
+
+            <mat-select
+
+              [value]="
+                settings().resolution
+              "
+
+              (selectionChange)="
+                update(
+                  'resolution',
+                  $event.value
+                )
+              ">
+
+              @for (
+                res of resolutions;
+                track res
+              ) {
+
+                <mat-option
+                  [value]="res">
+
+                  {{ res }}
+
+                </mat-option>
+
+              }
+
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+
+
+
+        <!-- FRAME RATE -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Frame rate
+            </span>
+
+            <span class="field-value">
+
+              {{ settings().frameRate }}
+              fps
+
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="10"
+            max="60"
+            step="5"
+            discrete>
+
+            <input
+              matSliderThumb
+
+              [value]="
+                settings().frameRate
+              "
+
+              (valueChange)="
+                update(
+                  'frameRate',
+                  $event
+                )
+              ">
+
+          </mat-slider>
+
+        </div>
+
+
+
+        <!-- WHITE BALANCE -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Auto white balance
+            </div>
+
+            <div class="toggle-desc">
+              Automatically corrects color temperature
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+
+            [checked]="
+              settings().autoWhiteBalance
+            "
+
+            (change)="
+              update(
+                'autoWhiteBalance',
+                $event.checked
+              )
+            ">
+
+          </mat-slide-toggle>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- ========================================= -->
+      <!-- ACTIONS -->
+      <!-- ========================================= -->
+
+      <div class="actions-bar">
+
+        <button
+          mat-button
+          (click)="resetToDefaults()">
+
+          Reset to defaults
+
+        </button>
+
+
+        <button
+          mat-flat-button
+          color="primary"
+
+          (click)="save()"
+
+          [disabled]="saving()">
+
+          @if (saving()) {
+
+            Saving...
+
+          } @else {
+
+            Save changes
+
+          }
+
+        </button>
+
+      </div>
+
+
+    </div>
+
+  }
+
+</div>

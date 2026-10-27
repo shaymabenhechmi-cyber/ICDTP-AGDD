@@ -1,0 +1,555 @@
+﻿<div class="settings-detail-page agdd-fade-in">
+
+  <!-- =========================================================
+       HEADER
+       ========================================================= -->
+
+  <div class="detail-header">
+
+    <a
+      mat-icon-button
+      routerLink="/settings"
+      class="back-btn"
+      aria-label="Back to settings"
+    >
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+
+    <div>
+      <h1>System Settings</h1>
+
+      <p>
+        Configure platform behavior, notifications and user preferences.
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       ERROR
+       ========================================================= -->
+
+  @if (error()) {
+
+    <div class="error-banner">
+
+      <mat-icon>warning</mat-icon>
+
+      <span>
+        {{ error() }}
+      </span>
+
+    </div>
+  }
+
+
+  <!-- =========================================================
+       LOADING
+       ========================================================= -->
+
+  @if (loading()) {
+
+    <div class="loading-state">
+
+      <mat-icon class="spin">
+        sync
+      </mat-icon>
+
+      <span>
+        Loading system settings...
+      </span>
+
+    </div>
+
+  } @else {
+
+
+    <div class="settings-form">
+
+
+      <!-- =====================================================
+           APPEARANCE
+           ===================================================== -->
+
+      <section class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            palette
+          </mat-icon>
+
+          Appearance
+
+        </h3>
+
+
+        
+
+        <!-- THEME -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Theme
+            </span>
+
+          </div>
+
+
+          <mat-form-field appearance="outline">
+
+            <mat-label>
+              Application theme
+            </mat-label>
+
+            <mat-select
+              [ngModel]="settings().theme"
+              (ngModelChange)="update('theme', $event)"
+            >
+
+              <mat-option value="dark">
+                Dark
+              </mat-option>
+
+              <mat-option value="light">
+                Light
+              </mat-option>
+
+              <mat-option value="system">
+                System default
+              </mat-option>
+
+            </mat-select>
+
+          </mat-form-field>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           SESSION & SECURITY
+           ===================================================== -->
+
+      <section class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            timer
+          </mat-icon>
+
+          Session & Security
+
+        </h3>
+
+
+        <!-- SESSION TIMEOUT -->
+
+        <div class="field-row">
+
+          <div class="field-label">
+
+            <span>
+              Session timeout
+            </span>
+
+            <span class="field-value">
+              {{ settings().sessionTimeoutMinutes }}
+              min
+            </span>
+
+          </div>
+
+
+          <mat-slider
+            min="15"
+            max="120"
+            step="15"
+            discrete
+          >
+
+            <input
+              matSliderThumb
+              [ngModel]="settings().sessionTimeoutMinutes"
+              (ngModelChange)="update(
+                'sessionTimeoutMinutes',
+                $event
+              )"
+            />
+
+          </mat-slider>
+
+        </div>
+
+
+        <!-- ROBOT CONFIRMATION -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Confirm robot actions
+            </div>
+
+            <div class="toggle-desc">
+              Ask for confirmation before executing
+              critical robot commands.
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+            [ngModel]="settings().confirmRobotActions"
+            (ngModelChange)="update(
+              'confirmRobotActions',
+              $event
+            )"
+          />
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           NOTIFICATIONS
+           ===================================================== -->
+
+      <section class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            notifications
+          </mat-icon>
+
+          Notifications
+
+        </h3>
+
+
+        <!-- EMAIL -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Email alerts
+            </div>
+
+            <div class="toggle-desc">
+              Receive important AGDD alerts by email.
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+            [ngModel]="settings().emailAlerts"
+            (ngModelChange)="update(
+              'emailAlerts',
+              $event
+            )"
+          />
+
+        </div>
+
+
+        <!-- PUSH -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Push notifications
+            </div>
+
+            <div class="toggle-desc">
+              Display real-time notifications in the dashboard.
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+            [ngModel]="settings().pushAlerts"
+            (ngModelChange)="update(
+              'pushAlerts',
+              $event
+            )"
+          />
+
+        </div>
+
+
+        <!-- SOUND -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Sound notifications
+            </div>
+
+            <div class="toggle-desc">
+              Play a sound when an important event occurs.
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+            [ngModel]="settings().soundNotifications"
+            (ngModelChange)="update(
+              'soundNotifications',
+              $event
+            )"
+          />
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           DASHBOARD
+           ===================================================== -->
+
+      <section class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            dashboard
+          </mat-icon>
+
+          Dashboard
+
+        </h3>
+
+
+        <!-- AUTO REFRESH -->
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Automatic refresh
+            </div>
+
+            <div class="toggle-desc">
+              Automatically update dashboard data.
+            </div>
+
+          </div>
+
+
+          <mat-slide-toggle
+            [ngModel]="settings().dashboardAutoRefresh"
+            (ngModelChange)="update(
+              'dashboardAutoRefresh',
+              $event
+            )"
+          />
+
+        </div>
+
+
+        <!-- REFRESH INTERVAL -->
+
+        @if (settings().dashboardAutoRefresh) {
+
+          <div class="field-row">
+
+            <div class="field-label">
+
+              <span>
+                Refresh interval
+              </span>
+
+              <span class="field-value">
+                {{ settings().dashboardRefreshInterval }}
+                sec
+              </span>
+
+            </div>
+
+
+            <mat-slider
+              min="1"
+              max="30"
+              step="1"
+              discrete
+            >
+
+              <input
+                matSliderThumb
+                [ngModel]="settings().dashboardRefreshInterval"
+                (ngModelChange)="update(
+                  'dashboardRefreshInterval',
+                  $event
+                )"
+              />
+
+            </mat-slider>
+
+          </div>
+
+        }
+
+      </section>
+
+
+
+      <!-- =====================================================
+           DASHBOARD LAYOUT
+           ===================================================== -->
+
+      <section class="agdd-card form-section">
+
+        <h3>
+
+          <mat-icon>
+            restore
+          </mat-icon>
+
+          Dashboard Layout
+
+        </h3>
+
+
+        <div class="toggle-row">
+
+          <div>
+
+            <div class="toggle-label">
+              Reset dashboard layout
+            </div>
+
+            <div class="toggle-desc">
+              Restore the default AGDD dashboard arrangement.
+            </div>
+
+          </div>
+
+
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="resetDashboardLayout()"
+          >
+            Reset Layout
+          </button>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           ACTIONS
+           ===================================================== -->
+
+      <div class="actions-bar">
+
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="resetToDefaults()"
+          [disabled]="saving()"
+        >
+
+          <mat-icon>
+            restart_alt
+          </mat-icon>
+
+          Reset
+
+        </button>
+
+
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="save()"
+          [disabled]="saving()"
+        >
+
+          @if (saving()) {
+
+            <ng-container>
+
+              <mat-icon class="spin-small">
+                sync
+              </mat-icon>
+
+              <span>
+                Saving...
+              </span>
+
+            </ng-container>
+
+          } @else {
+
+            <ng-container>
+
+              <mat-icon>
+                save
+              </mat-icon>
+
+              <span>
+                Save Changes
+              </span>
+
+            </ng-container>
+
+          }
+
+        </button>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           SUCCESS
+           ===================================================== -->
+
+      @if (saved()) {
+
+        <div class="save-success">
+
+          <mat-icon>
+            check_circle
+          </mat-icon>
+
+          <span>
+            System settings saved successfully.
+          </span>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,641 @@
+
+/* ============================================================
+   USERS PAGE
+   ============================================================ */
+
+.users-page {
+  padding: 24px;
+  min-height: 100%;
+  color: var(--agdd-text, #17202a);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0 0 4px 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  p {
+    color: var(--agdd-text-muted);
+    margin: 0;
+  }
+
+  button {
+    height: 42px;
+  }
+}
+
+/* ============================================================
+   TABLE CARD
+   ============================================================ */
+
+.table-card {
+  padding: 8px 20px 4px;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* ============================================================
+   TABLE TOOLBAR
+   ============================================================ */
+
+.table-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 0 4px;
+
+  .search-field {
+    width: 300px;
+  }
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.users-table {
+  width: 100%;
+  background: transparent;
+}
+
+/* Light mode table */
+
+.users-table th.mat-mdc-header-cell {
+  background: transparent;
+  color: var(--agdd-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom-color: var(--agdd-border);
+}
+
+.users-table td.mat-mdc-cell {
+  color: var(--agdd-text);
+  border-bottom-color: var(--agdd-border);
+  font-size: 13px;
+}
+
+.users-table tr.mat-mdc-row {
+  transition: background 0.18s ease;
+}
+
+.users-table tr.mat-mdc-row:hover {
+  background: var(--agdd-surface-soft);
+}
+
+/* ============================================================
+   ROLE CHIP
+   ============================================================ */
+
+.role-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* Light mode */
+
+.role-admin {
+  background: #ffe0e0;
+  color: #b71c1c;
+}
+
+.role-operator {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.role-visitor {
+  background: #e3f2fd;
+  color: #0d47a1;
+}
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+.status-dot {
+  display: inline-block;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+
+  background: #cbd5e1;
+
+  margin-right: 6px;
+
+  &.active {
+    background: var(--agdd-success);
+  }
+}
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.actions-header {
+  text-align: right;
+}
+
+.actions-cell {
+  text-align: right;
+
+  button {
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background: var(--agdd-surface-soft);
+    }
+
+    &:active {
+      transform: scale(0.94);
+    }
+  }
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.empty-state {
+  text-align: center;
+  padding: 40px 0;
+
+  color: var(--agdd-text-muted);
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+  }
+
+  p {
+    margin-top: 10px;
+  }
+}
+
+/* ============================================================
+   MODAL BACKDROP
+   ============================================================ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(15, 23, 42, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+
+  backdrop-filter: blur(3px);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.modal-panel {
+  width: 440px;
+  max-width: 92vw;
+
+  padding: 28px 28px 20px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+
+  h2 {
+    margin: 0 0 18px 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--agdd-text);
+  }
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.enabled-toggle {
+  display: block;
+  margin: 8px 0 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+
+:host-context(html[data-theme="dark"]) {
+
+  .users-page {
+    --users-bg: #0f1418;
+    --users-surface: #171d22;
+    --users-surface-soft: #1c2329;
+    --users-border: #2a333b;
+
+    --users-text: #edf2f5;
+    --users-text-muted: #aab4bc;
+    --users-text-soft: #77838d;
+
+    background: var(--users-bg);
+    color: var(--users-text);
+  }
+
+  /* ----------------------------------------------------------
+     HEADER
+     ---------------------------------------------------------- */
+
+  .page-header {
+
+    h1 {
+      color: var(--users-text);
+    }
+
+    p {
+      color: var(--users-text-muted);
+    }
+  }
+
+  /* ----------------------------------------------------------
+     CARD
+     ---------------------------------------------------------- */
+
+  .table-card {
+    background: var(--users-surface);
+    border-color: var(--users-border);
+
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.22);
+  }
+
+  /* ----------------------------------------------------------
+     SEARCH FIELD
+     ---------------------------------------------------------- */
+
+  .search-field {
+
+    .mdc-text-field--outlined {
+      background: var(--users-surface-soft);
+    }
+
+    .mdc-floating-label,
+    .mat-mdc-input-element {
+      color: var(--users-text);
+    }
+
+    .mat-mdc-input-element::placeholder {
+      color: var(--users-text-soft);
+      opacity: 1;
+    }
+
+    .mat-mdc-form-field-icon-suffix {
+      color: var(--users-text-muted);
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: var(--users-border);
+    }
+
+    &:hover {
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #4b5963;
+      }
+    }
+
+    .mdc-text-field--focused {
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: var(--agdd-primary);
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     TABLE
+     ---------------------------------------------------------- */
+
+  .users-table {
+    background: transparent;
+
+    th.mat-mdc-header-cell {
+      background: var(--users-surface);
+      color: var(--users-text-muted);
+      border-bottom-color: var(--users-border);
+    }
+
+    td.mat-mdc-cell {
+      color: var(--users-text);
+      border-bottom-color: var(--users-border);
+    }
+
+    tr.mat-mdc-row {
+      background: transparent;
+    }
+
+    tr.mat-mdc-row:hover {
+      background: var(--users-surface-soft);
+    }
+  }
+
+  /* ----------------------------------------------------------
+     ROLE CHIPS
+     ---------------------------------------------------------- */
+
+  .role-admin {
+    background: #3d2225;
+    color: #ff9b9b;
+  }
+
+  .role-operator {
+    background: #3a3018;
+    color: #e8c96a;
+  }
+
+  .role-visitor {
+    background: #1d3040;
+    color: #8dc9f5;
+  }
+
+  /* ----------------------------------------------------------
+     STATUS
+     ---------------------------------------------------------- */
+
+  .status-dot {
+    background: #4b555d;
+
+    &.active {
+      background: var(--agdd-success, #32b77f);
+    }
+  }
+
+  /* ----------------------------------------------------------
+     ACTION BUTTONS
+     ---------------------------------------------------------- */
+
+  .actions-cell {
+
+    button {
+
+      mat-icon {
+        color: var(--users-text-muted);
+      }
+
+      &:hover {
+        background: #242d34;
+
+        mat-icon {
+          color: var(--users-text);
+        }
+      }
+    }
+
+    button[color="warn"] {
+
+      mat-icon {
+        color: #e36565;
+      }
+
+      &:hover {
+        background: #3d2225;
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     EMPTY STATE
+     ---------------------------------------------------------- */
+
+  .empty-state {
+    color: var(--users-text-muted);
+  }
+
+  /* ----------------------------------------------------------
+     MODAL
+     ---------------------------------------------------------- */
+
+  .modal-backdrop {
+    background: rgba(0, 0, 0, 0.68);
+  }
+
+  .modal-panel {
+    background: var(--users-surface);
+    border: 1px solid var(--users-border);
+
+    box-shadow:
+      0 18px 50px rgba(0, 0, 0, 0.45);
+
+    h2 {
+      color: var(--users-text);
+    }
+  }
+
+  /* ----------------------------------------------------------
+     MATERIAL FORM FIELDS IN MODAL
+     ---------------------------------------------------------- */
+
+  .modal-panel {
+
+    .mat-mdc-form-field {
+
+      .mdc-text-field--outlined {
+        background: var(--users-surface-soft);
+      }
+
+      .mdc-floating-label {
+        color: var(--users-text-muted);
+      }
+
+      .mat-mdc-input-element {
+        color: var(--users-text);
+        caret-color: var(--users-text);
+      }
+
+      .mat-mdc-input-element::placeholder {
+        color: var(--users-text-soft);
+      }
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: var(--users-border);
+      }
+
+      &:hover {
+
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #4b5963;
+        }
+      }
+
+      &.mat-focused {
+
+        .mdc-floating-label {
+          color: var(--agdd-primary);
+        }
+
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--agdd-primary);
+        }
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     SLIDE TOGGLE
+     ---------------------------------------------------------- */
+
+  .enabled-toggle {
+    color: var(--users-text);
+  }
+
+  /* ----------------------------------------------------------
+     MODAL BUTTONS
+     ---------------------------------------------------------- */
+
+  .modal-actions {
+
+    button[mat-button] {
+      color: var(--users-text-muted);
+
+      &:hover {
+        background: var(--users-surface-soft);
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     PAGINATOR
+     ---------------------------------------------------------- */
+
+  ::ng-deep .mat-mdc-paginator {
+    background: var(--users-surface);
+    color: var(--users-text-muted);
+    border-top-color: var(--users-border);
+  }
+
+  ::ng-deep .mat-mdc-paginator-container {
+    color: var(--users-text-muted);
+  }
+
+  ::ng-deep .mat-mdc-paginator-page-size-label,
+  ::ng-deep .mat-mdc-paginator-range-label {
+    color: var(--users-text-muted);
+  }
+
+  ::ng-deep .mat-mdc-paginator-icon {
+    fill: var(--users-text-muted);
+  }
+
+  ::ng-deep .mat-mdc-icon-button:hover {
+    background: var(--users-surface-soft);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .users-page {
+    padding: 18px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 14px;
+
+    button {
+      align-self: flex-start;
+    }
+  }
+
+  .table-toolbar {
+    justify-content: stretch;
+
+    .search-field {
+      width: 100%;
+    }
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+
+  .users-table {
+    min-width: 850px;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .users-page {
+    padding: 14px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .modal-panel {
+    padding: 22px 18px 16px;
+  }
+}

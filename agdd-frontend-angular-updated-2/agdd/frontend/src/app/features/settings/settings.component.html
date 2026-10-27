@@ -1,0 +1,33 @@
+<div class="settings-page agdd-fade-in">
+
+  <div class="page-header">
+    <h1>Settings</h1>
+    <p>Manage your AGDD platform preferences and account settings.</p>
+  </div>
+
+  <div class="settings-grid">
+
+    @for (card of settingCards; track card.title) {
+
+      <a
+        class="agdd-card setting-card"
+        [routerLink]="card.route">
+
+        <mat-icon>{{ card.icon }}</mat-icon>
+
+        <h3>{{ card.title }}</h3>
+
+        <p>{{ card.description }}</p>
+
+        <span class="open-link">
+          Configure
+          <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+        </span>
+
+      </a>
+
+    }
+
+  </div>
+
+</div>
